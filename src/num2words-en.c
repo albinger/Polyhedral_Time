@@ -3,49 +3,70 @@
 #include "pebble.h"
 
 
-void time_to_words(int hours, int minutes, char* words, size_t length) {
+  
+  
+int time_to_words(int hours, int minutes, char* words, size_t length) {
 
-  //memset(words, 0, length);
-  char hrs[9];
-  char mns[9];
+  
+  memset(words, 0, length);
+  char hrs[10];
+  char mns[10];
   
   int hrand;
   int mrand;
   
   static const int const DICE[] = {
-  4,
-  6,
-  8,
-  10,  
-  12,
+    4,
+    6,
+    8,
+    10,  
+    12,
+    20,
+    12,
+    10,
+    8,
+    6,
+    4
 };
   
-  srand(time(NULL));
+  //srand(time(NULL));
   
   //d4, d6, d8, d10, d12
   
   
-  hrand = DICE[rand()%4];
-  mrand = DICE[rand()%4];
+  hrand = DICE[rand()%5];
+  mrand = DICE[rand()%11];
   
-  if(hours%hrand != 0){
-    snprintf(hrs,9,"%id%i+%i",(hours/hrand),hrand,(hours%hrand));
-  }else{  
-    snprintf(hrs,9,"%id%i",(hours/hrand),hrand);
-  }
  
-  if(minutes%mrand != 0){
-    snprintf(mns,9,"%id%i+%i",(minutes/mrand),mrand,(minutes%mrand));
+  
+  if(hours/hrand==0){
+    snprintf(hrs,9,"1d%i-%i",hrand,hrand-hours);
   }else{
-    snprintf(mns,9,"%id%i", (minutes/mrand),mrand);
+    if(hours%hrand != 0){
+      snprintf(hrs,9,"%id%i+%i",(hours/hrand),hrand,(hours%hrand));
+    }else{  
+      snprintf(hrs,9,"%id%i",(hours/hrand),hrand);
+    }
   }
-  snprintf(words,length,"%s %s ",hrs,mns);    
+  if(minutes/mrand==0){
+    snprintf(mns,9,"1d%i-%i",mrand,mrand-minutes);
+  }else{ 
+    if(minutes%mrand != 0){
+      snprintf(mns,9,"%id%i+%i",(minutes/mrand),mrand,(minutes%mrand));
+    }else{
+      snprintf(mns,9,"%id%i", (minutes/mrand),mrand);
+    }
+  }
+  snprintf(words,length,"%s %s 0",hrs,mns);  
+  APP_LOG(APP_LOG_LEVEL_INFO,"TTW:%s:",words);
+   if(mrand == 20){return(0); }else{return(1);}
 }
 
-void time_to_3words(int hours, int minutes, char *line1, char *line2, char *line3, size_t length)
+int time_to_3words(int hours, int minutes, char *line1, char *line2, char *line3, size_t length)
 {
 	char value[length];
-	time_to_words(hours, minutes, value, length);
+  int ShowDie;
+	ShowDie = time_to_words(hours, minutes, value, length);
 	
 	memset(line1, 0, length);
 	memset(line2, 0, length);
@@ -73,4 +94,5 @@ void time_to_3words(int hours, int minutes, char *line1, char *line2, char *line
 			pch[0] = 0;
 		}
 	}
+  return(ShowDie);
 }

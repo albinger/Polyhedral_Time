@@ -1,10 +1,14 @@
 #include "pebble.h"
 #include "num2words-en.h"
 
-#define DEBUG 1
+#define DEBUG 0
 #define BUFFER_SIZE 44
 
+  
 static Window *window;
+
+static BitmapLayer *s_background_layer;
+static GBitmap *s_background_bitmap;
 
 typedef struct {
 	TextLayer *currentLayer;
@@ -106,9 +110,14 @@ static void display_time(struct tm *t)
 	char textLine1[BUFFER_SIZE];
 	char textLine2[BUFFER_SIZE];
 	char textLine3[BUFFER_SIZE];
+	int ShowDie;
+  
+	ShowDie = time_to_3words(t->tm_hour, t->tm_min, textLine1, textLine2, textLine3, BUFFER_SIZE);
 	
-	time_to_3words(t->tm_hour, t->tm_min, textLine1, textLine2, textLine3, BUFFER_SIZE);
-	
+  
+  layer_set_hidden(bitmap_layer_get_layer(s_background_layer), ShowDie);
+  
+  
 	if (needToUpdateLine(&line1, line1Str, textLine1)) {
 		updateLineTo(&line1, line1Str, textLine1);	
 	}
@@ -124,7 +133,6 @@ static void display_time(struct tm *t)
 static void display_initial_time(struct tm *t)
 {
 	time_to_3words(t->tm_hour, t->tm_min, line1Str[0], line2Str[0], line3Str[0], BUFFER_SIZE);
-	
 	text_layer_set_text(line1.currentLayer, line1Str[0]);
 	text_layer_set_text(line2.currentLayer, line2Str[0]);
 	text_layer_set_text(line3.currentLayer, line3Str[0]);
@@ -193,6 +201,19 @@ static void init() {
   window_stack_push(window, true);
   window_set_background_color(window, GColorBlack);
 
+  
+  // seed random
+  srand(time(NULL));
+  
+  
+  //Create GBitmap, then set to created BitmapLayer
+  s_background_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_D20);
+  s_background_layer = bitmap_layer_create(GRect(22, 50, 102, 168));
+  bitmap_layer_set_bitmap(s_background_layer, s_background_bitmap);
+  layer_set_hidden(bitmap_layer_get_layer(s_background_layer), 1);
+  layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(s_background_layer));
+  
+  
 	// Custom fonts
 	lightFont = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_gotham_light_31));
 	boldFont = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_gotham_bold_36));

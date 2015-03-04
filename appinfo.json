@@ -9,6 +9,11 @@
     "resources": {
         "media": [
             {
+                "file": "images/D20.png",
+                "name": "IMAGE_D20",
+                "type": "png"
+            },
+            {
                 "file": "images/D12.png",
                 "menuIcon": true,
                 "name": "IMAGE_D12",
@@ -30,7 +35,7 @@
     "shortName": "Polyhedral Time",
     "uuid": "11d8c7bf-c0b7-49ee-b0f5-445e5bbdb427",
     "versionCode": 1,
-    "versionLabel": "1.0",
+    "versionLabel": "1.02",
     "watchapp": {
         "watchface": true
     }
