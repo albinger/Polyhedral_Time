@@ -35,7 +35,7 @@
     "shortName": "Polyhedral Time",
     "uuid": "11d8c7bf-c0b7-49ee-b0f5-445e5bbdb427",
     "versionCode": 1,
-    "versionLabel": "1.02",
+    "versionLabel": "1.04",
     "watchapp": {
         "watchface": true
     }
