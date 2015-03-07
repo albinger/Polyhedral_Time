@@ -4,11 +4,6 @@
 #define DEBUG 0
 #define BUFFER_SIZE 44
 
-//#ifdef DEBUG
-#define APP_LOG_D app_log(level, __FILE_NAME__, __LINE__, fmt, ## args)
-//#else
-//#define APP_LOG_D do { } while(0)
-//#endif  
 static Window *window;
 
 static BitmapLayer *s_background_layer;
@@ -36,16 +31,10 @@ static char line2Str[2][BUFFER_SIZE];
 int pauseAnimation;
 
 // Animation handler
-//static void animationStoppedHandler(struct Animation *animation, bool finished, void *context, Line *line)
 static void animationStoppedHandler(struct Animation *animation, bool finished, void *context)
 {
 
   property_animation_destroy((PropertyAnimation *) context);
-  //APP_LOG(APP_LOG_LEVEL_INFO,"animation_destroy");
-//	Layer *textLayer = text_layer_get_layer((TextLayer *)context);
-//	GRect rect = layer_get_frame(textLayer);
-//	rect.origin.x = 144;
-//	layer_set_frame(textLayer, rect);
 }
 
 // Animate line
@@ -54,40 +43,25 @@ static void makeAnimationsForLayers(Line *line, TextLayer *current, TextLayer *n
   if (pauseAnimation){return;}
 	GRect fromRect = layer_get_frame(text_layer_get_layer(next));
 	GRect toRect = fromRect;
-	//toRect.origin.x -= 144;
 	fromRect.origin.x=144;
   toRect.origin.x = 0;
-  //APP_LOG(APP_LOG_LEVEL_INFO,"1");
 	line->nextAnimation = property_animation_create_layer_frame(text_layer_get_layer(next), &fromRect, &toRect);
-	//APP_LOG(APP_LOG_LEVEL_INFO,"2");
   animation_set_duration((Animation *)line->nextAnimation, 400);
-	//APP_LOG(APP_LOG_LEVEL_INFO,"3");
   animation_set_curve((Animation *)line->nextAnimation, AnimationCurveEaseOut);
-  //APP_LOG(APP_LOG_LEVEL_INFO,"4");
   animation_set_handlers((Animation *)line->nextAnimation, (AnimationHandlers){
     .stopped = (AnimationStoppedHandler)animationStoppedHandler}, line->nextAnimation);
-  //APP_LOG(APP_LOG_LEVEL_INFO,"4.5");
 	animation_schedule((Animation *)line->nextAnimation);
-	//APP_LOG(APP_LOG_LEVEL_INFO,"5");
 	GRect fromRect2 = layer_get_frame(text_layer_get_layer(current));
-  //APP_LOG(APP_LOG_LEVEL_INFO,"6");
 	GRect toRect2 = fromRect2;
-	//toRect2.origin.x -= 144;
 	fromRect2.origin.x = 0;
   toRect2.origin.x = -144;
-  //APP_LOG(APP_LOG_LEVEL_INFO,"7");
 	line->currentAnimation = property_animation_create_layer_frame(text_layer_get_layer(current), &fromRect2, &toRect2);
-	//APP_LOG(APP_LOG_LEVEL_INFO,"8");
   animation_set_duration((Animation *)line->currentAnimation, 400);
-	//APP_LOG(APP_LOG_LEVEL_INFO,"9");
   animation_set_curve((Animation *)line->currentAnimation, AnimationCurveEaseOut);
-	//APP_LOG(APP_LOG_LEVEL_INFO,"10");
 	animation_set_handlers((Animation *)line->currentAnimation, (AnimationHandlers) {
 		.stopped = (AnimationStoppedHandler)animationStoppedHandler
 	}, line->currentAnimation);
-	//APP_LOG(APP_LOG_LEVEL_INFO,"11");
 	animation_schedule((Animation *)line->currentAnimation);
-  //APP_LOG(APP_LOG_LEVEL_INFO,"12");
 }
 
 // Update line
@@ -104,16 +78,13 @@ static void updateLineTo(Line *line, char lineStr[2][BUFFER_SIZE], char *value)
 		memset(lineStr[1], 0, BUFFER_SIZE);
 		memcpy(lineStr[1], value, strlen(value));
 		text_layer_set_text(next, lineStr[1]);
-    //APP_LOG(APP_LOG_LEVEL_INFO,"tlst");
 	} else {
 		memset(lineStr[0], 0, BUFFER_SIZE);
 		memcpy(lineStr[0], value, strlen(value));
 		text_layer_set_text(next, lineStr[0]);
-    //APP_LOG(APP_LOG_LEVEL_INFO,"tlst");
 	}
 	
 	makeAnimationsForLayers(line, current, next);
-  //APP_LOG(APP_LOG_LEVEL_INFO,"end ULT");
 }
 
 // Check to see if the current line needs to be updated
@@ -139,28 +110,17 @@ static void display_time(struct tm *t)
 	
 	int ShowDie;
   
-  //APP_LOG(APP_LOG_LEVEL_INFO,"call ttw");
-	ShowDie = time_to_2words(t->tm_hour, t->tm_min, textLine1, textLine2, BUFFER_SIZE);
-  //APP_LOG(APP_LOG_LEVEL_INFO, "got1:%s:", textLine1);
-  //APP_LOG(APP_LOG_LEVEL_INFO, "got2:%s:", textLine2);
-	
+	ShowDie = time_to_2words(t->tm_hour, t->tm_min, textLine1, textLine2, BUFFER_SIZE);	
   
   layer_set_hidden(bitmap_layer_get_layer(s_background_layer), ShowDie);
-  //APP_LOG(APP_LOG_LEVEL_INFO, "hidden");
   
 	if (needToUpdateLine(&line1, line1Str, textLine1)) {
-        //APP_LOG(APP_LOG_LEVEL_INFO,"nTUL");
 		updateLineTo(&line1, line1Str, textLine1);	
-    //APP_LOG(APP_LOG_LEVEL_INFO,"uLT");
 	}
-//APP_LOG(APP_LOG_LEVEL_INFO,"line1");
 
   if (needToUpdateLine(&line2, line2Str, textLine2)) {
-   // APP_LOG(APP_LOG_LEVEL_INFO,"nTUL");
 		updateLineTo(&line2, line2Str, textLine2);	
-    //APP_LOG(APP_LOG_LEVEL_INFO,"uLT");
 	}
-  //APP_LOG(APP_LOG_LEVEL_INFO,"line2");
 }
 
 // Update screen without animation first time we start the watchface
@@ -169,10 +129,7 @@ static void display_initial_time(struct tm *t)
 	time_to_2words(t->tm_hour, t->tm_min, line1Str[0], line2Str[0], BUFFER_SIZE);
 	text_layer_set_text(line1.currentLayer, line1Str[0]);
 	text_layer_set_text(line2.currentLayer, line2Str[0]);
-	
-  //APP_LOG(APP_LOG_LEVEL_INFO, "got1:%s:", line1Str[0]);
-  //APP_LOG(APP_LOG_LEVEL_INFO, "got2:%s:", line2Str[0]);
-  
+	  
 }
 
 // Debug methods. For quickly debugging enable debug macro on top to transform the watchface into
@@ -230,17 +187,14 @@ static void configureLightLayer(TextLayer *textlayer)
 // Time handler called every minute by the system
 static void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
 	t = tick_time;
-  //APP_LOG(APP_LOG_LEVEL_INFO, "tick");
   display_time(tick_time);
 }
 
 void focus_handler(bool in_focus) {
   if (in_focus) {
-    //APP_LOG(APP_LOG_LEVEL_INFO, "App window is back in focus");
     pauseAnimation = 0;
     display_time(t);
   } else {
-    //APP_LOG(APP_LOG_LEVEL_INFO, "App window is out of focus");
     pauseAnimation = 1;
   }
 }
@@ -305,8 +259,7 @@ static void init() {
 
             
 static void deinit() {
-  //APP_LOG(APP_LOG_LEVEL_INFO,"deinit called");
-	tick_timer_service_unsubscribe();
+  tick_timer_service_unsubscribe();
   app_focus_service_unsubscribe();
 	window_destroy(window);
 }
